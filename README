@@ -1,0 +1,53 @@
+This is the template for a KGP agent using Java.  It contains the
+following files to get started:
+
+* Agent.java
+
+  We suggest you implement your agent in this file.  It imports the
+  library that you don't have to touch.
+
+* jkgp.jar
+
+  This archive contains the entire library.  As long as it is placed
+  in the classpath, Java will find and use it.  We have rendered the
+  Javadoc here:
+
+    https://wwwcip.cs.fau.de/~el82onyk/jkgp_doc/
+
+* ABOUT
+
+  The file describing your submission.  We require your team to be
+  able and provide at least a basic description of their approach.
+  This file also contains a list of all your team members. DO NOT
+  FORGET to fill it out before submitting your solution.
+
+* Dockerfile
+
+  The actual tournament makes use of Docker containers[0], and we want
+  all submissions to be uploaded with a functional "Dockerfile" (that
+  describes how the agent is built and executed).
+
+  If you use additional third-party libraries, make sure they are also
+  fetched and initialised in the Dockerfile.  In case you change the
+  directory structure, please also make sure that the Dockerfile still
+  builds sucessfully.
+
+* practice.sh
+
+  Use this script to your agent connect to the public practice
+  server (https://kalah.kwarc.info).  This is just a convenience
+  feature, you don't have to use it.
+
+* prepare.sh
+
+  Use this script to bundle your agent and all related files into a
+  complete submission.  The script will try and to some basic checks
+  to make sure all the necessary conditions for a submission are met.
+  Not all submissions that pass this script are necessarily correct,
+  but if the script emits an error or a warning, there is probably
+  something wrong.
+
+If you have any issues, please refer to the information on the public
+practice server:
+
+  https://kalah.kwarc.info/about
