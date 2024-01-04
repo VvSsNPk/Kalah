@@ -34,6 +34,22 @@ class Agent extends info.kwarc.kalah.Agent {
         this.submitMove(moves.get(rnd));
     }
 
+    private KalahState minmax(KalahState a) {
+
+
+        return a;
+    }
+
+    private void max(KalahState a){
+
+    }
+
+    private void min(KalahState a){
+
+    }
+
+
+
     public static void main(String[] args) throws IOException {
         new Agent().run();
     }
