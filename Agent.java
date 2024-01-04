@@ -35,17 +35,17 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     private KalahState minmax(KalahState a) {
-
+        max(a);
 
         return a;
     }
 
     private void max(KalahState a){
-
+        min(a);
     }
 
     private void min(KalahState a){
-
+        max(a);
     }
 
 
