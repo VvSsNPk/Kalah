@@ -51,6 +51,29 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     public static void main(String[] args) throws IOException {
-        new Agent().run();
+
+        KalahState state = new KalahState(6, 4);
+        var list = state.getMoves();
+        //System.out.println(list);
+        KalahState copy = new KalahState(state);
+
+        //copy.doMove(2);
+        var test = copy.isDoubleMove(2);
+        //System.out.println(copy);
+        copy.doMove(2);
+        //System.out.println(test);
+        //System.out.println(copy);
+        list = copy.getMoves();
+        //System.out.println(list);
+        List<KalahState> store = new ArrayList<>();
+        for (Integer integer : list) {
+            KalahState copier = new KalahState(state);
+            copier.doMove(integer);
+            store.add(copier);
+        }
+        for (KalahState state1 : store){
+            System.out.println(state1);
+        }
+        //new Agent().run();
     }
 }

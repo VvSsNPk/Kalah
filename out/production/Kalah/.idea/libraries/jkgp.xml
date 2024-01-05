@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jkgp">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jkgp.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
