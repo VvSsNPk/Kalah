@@ -34,10 +34,23 @@ class Agent extends info.kwarc.kalah.Agent {
         this.submitMove(moves.get(rnd));
     }
 
-    private KalahState minmax(KalahState a) {
-        max(a);
+    private int minmax(KalahState state) {
+        int bestMove = -1;
+        int bestScore = Integer.MIN_VALUE;
+        ArrayList<Integer> a = state.getMoves();
+        for (int i = 0; i < a.size(); i++) {
+            if (state.getHouse(KalahState.Player.SOUTH,a.get(i)) != 0) { // Checking if the pit is not empty
+                state.doMove(i);
+                int score = evaluateMove(newGameState);
 
-        return a;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = i;
+                }
+            }
+        }
+
+        return bestMove;
     }
 
     private void max(KalahState a){
