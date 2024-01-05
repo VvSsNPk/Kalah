@@ -29,9 +29,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
     @Override
     public void search(KalahState ks) throws IOException {
-        ArrayList<Integer> moves = ks.getMoves();
-        int rnd = rng.nextInt(moves.size());
-        this.submitMove(moves.get(rnd));
+        this.submitMove(minmax(ks));
     }
 
     private int minmax(KalahState state) {
@@ -40,8 +38,9 @@ class Agent extends info.kwarc.kalah.Agent {
         ArrayList<Integer> a = state.getMoves();
         for (int i = 0; i < a.size(); i++) {
             if (state.getHouse(KalahState.Player.SOUTH,a.get(i)) != 0) { // Checking if the pit is not empty
-                state.doMove(i);
-                int score = evaluateMove(newGameState);
+                KalahState copyState = new KalahState(state);
+                copyState.doMove(i);
+                int score = evaluateMove(copyState);
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -51,6 +50,10 @@ class Agent extends info.kwarc.kalah.Agent {
         }
 
         return bestMove;
+    }
+
+    private int evaluateMove(KalahState state){
+        return state.getHouseSumSouth() - state.getHouseSumNorth();
     }
 
     private void max(KalahState a){
@@ -73,12 +76,13 @@ class Agent extends info.kwarc.kalah.Agent {
         //copy.doMove(2);
         var test = copy.isDoubleMove(2);
         //System.out.println(copy);
-        copy.doMove(2);
+        copy.doMove(3);
+        System.out.println(copy);
         //System.out.println(test);
         //System.out.println(copy);
-        list = copy.getMoves();
+        //list = copy.getMoves();
         //System.out.println(list);
-        List<KalahState> store = new ArrayList<>();
+        /*List<KalahState> store = new ArrayList<>();
         for (Integer integer : list) {
             KalahState copier = new KalahState(state);
             copier.doMove(integer);
@@ -86,7 +90,7 @@ class Agent extends info.kwarc.kalah.Agent {
         }
         for (KalahState state1 : store){
             System.out.println(state1);
-        }
+        }*/
         //new Agent().run();
     }
 }
