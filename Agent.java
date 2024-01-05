@@ -61,11 +61,11 @@ class Agent extends info.kwarc.kalah.Agent {
         var test = copy.isDoubleMove(2);
         //System.out.println(copy);
         copy.doMove(2);
-        //System.out.println(test);
+        System.out.println(test);
         //System.out.println(copy);
         list = copy.getMoves();
         //System.out.println(list);
-        List<KalahState> store = new ArrayList<>();
+ /*       List<KalahState> store = new ArrayList<>();
         for (Integer integer : list) {
             KalahState copier = new KalahState(state);
             copier.doMove(integer);
@@ -73,7 +73,7 @@ class Agent extends info.kwarc.kalah.Agent {
         }
         for (KalahState state1 : store){
             System.out.println(state1);
-        }
+        }*/
         //new Agent().run();
     }
 }
