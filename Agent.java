@@ -91,6 +91,6 @@ class Agent extends info.kwarc.kalah.Agent {
         for (KalahState state1 : store){
             System.out.println(state1);
         }*/
-        //new Agent().run();
+        new Agent().run();
     }
 }
