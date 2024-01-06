@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Tree {
     private KalahState state;
-    private ArrayList<KalahState> children;
+    private ArrayList<Tree> children;
     private Integer eval;
 
     public Tree(KalahState state, Integer eval) {
