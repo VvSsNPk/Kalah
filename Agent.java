@@ -19,10 +19,10 @@ class Agent extends info.kwarc.kalah.Agent {
               System.getenv("USE_WEBSOCKET") != null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
-              null, // agent name
-              null, // author list
-              null, // description
-              null, // agent token
+              "NoobMax Algorithm", // agent name
+              "Praveen Kumar, Sagar Sikdar", // author list
+              "Minmax noob algorithm", // description
+              "GODISALSOHUMAN", // agent token
               false  // suppress network
               );
     }
@@ -30,19 +30,16 @@ class Agent extends info.kwarc.kalah.Agent {
     @Override
     public void search(KalahState ks) throws IOException {
         int bestMove = 0;
-        int bestState = -1000000000;
+        int bestState = Integer.MIN_VALUE;
         int state;
         int depth = 1;
         for(Integer a : ks.getMoves()){
-            while(true){
-                if(shouldStop()){
-                    break;
-                }
-                if(ks.isLegalMove(a)){
+            while (!shouldStop()) {
+                if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
-                    state = minmax(copy,depth, -1000000000,1000000000);
-                    if(state > bestState){
+                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    if (state > bestState) {
                         bestState = state;
                         bestMove = a;
                     }
@@ -57,12 +54,13 @@ class Agent extends info.kwarc.kalah.Agent {
         int bestState = 0;
         int state;
         if(depth <= 0) return  evaluation(a);
+        bestState = a.getSideToMove() == KalahState.Player.SOUTH ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         for(int i = 0; i<a.getBoardSize();i++){
             if(a.isLegalMove(i)){
                 KalahState copy = new KalahState(a);
                 copy.doMove(i);
                 if (copy.getSideToMove() == KalahState.Player.SOUTH){
-                    bestState = 1000000000;
+                    //bestState = Integer.MAX_VALUE;
                     state = minmax(copy,--depth,alpha,beta);
                     bestState = Math.min(bestState,state);
                     beta = Math.min(beta,bestState);
@@ -71,7 +69,7 @@ class Agent extends info.kwarc.kalah.Agent {
                     }
                 }
                 else {
-                    bestState = -1000000000;
+                    //bestState = -1000000000;
                     state = minmax(copy, --depth,alpha,beta);
                     bestState = Math.max(bestState, state);
                     alpha = Math.max(alpha, bestState);
@@ -87,9 +85,15 @@ class Agent extends info.kwarc.kalah.Agent {
 
     public int evaluation(KalahState a){
         if(a.getSideToMove() == KalahState.Player.SOUTH){
+            if(a.getHouseSumSouth() > a.totalSeeds() / 2){
+                return Integer.MAX_VALUE;
+            }
             return a.getHouseSumSouth() - a.getHouseSumNorth();
         }
         else{
+            if(a.getHouseSumNorth() > a.totalSeeds() / 2){
+                return  Integer.MAX_VALUE;
+            }
             return a.getHouseSumNorth() - a.getHouseSumSouth();
         }
     }
@@ -97,29 +101,6 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     public static void main(String[] args) throws IOException {
-
-    /*    KalahState state = new KalahState(6, 4);
-        var list = state.getMoves();
-        //System.out.println(list);
-        KalahState copy = new KalahState(state);
-
-        //copy.doMove(2);
-        var test = copy.isDoubleMove(2);
-        //System.out.println(copy);
-        copy.doMove(2);
-        System.out.println(test);
-        //System.out.println(copy);
-        list = copy.getMoves();*/
-        //System.out.println(list);
- /*       List<KalahState> store = new ArrayList<>();
-        for (Integer integer : list) {
-            KalahState copier = new KalahState(state);
-            copier.doMove(integer);
-            store.add(copier);
-        }
-        for (KalahState state1 : store){
-            System.out.println(state1);
-        }*/
         new Agent().run();
     }
 }
