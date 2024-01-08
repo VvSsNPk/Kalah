@@ -29,30 +29,76 @@ class Agent extends info.kwarc.kalah.Agent {
 
     @Override
     public void search(KalahState ks) throws IOException {
-        ArrayList<Integer> moves = ks.getMoves();
-        int rnd = rng.nextInt(moves.size());
-        this.submitMove(moves.get(rnd));
+        int bestMove = 0;
+        int bestState = -1000000000;
+        int state;
+        int depth = 1;
+        for(Integer a : ks.getMoves()){
+            while(true){
+                if(shouldStop()){
+                    break;
+                }
+                if(ks.isLegalMove(a)){
+                    KalahState copy = new KalahState(ks);
+                    copy.doMove(a);
+                    state = minmax(copy,depth, -1000000000,1000000000);
+                    if(state > bestState){
+                        bestState = state;
+                        bestMove = a;
+                    }
+                }
+            }
+            depth++;
+        }
+        submitMove(bestMove);
     }
 
-    private KalahState minmax(KalahState a) {
-        max(a);
+    private int minmax(KalahState a, int depth, int alpha, int beta) {
+        int bestState = 0;
+        int state;
+        if(depth <= 0) return  evaluation(a);
+        for(int i = 0; i<a.getBoardSize();i++){
+            if(a.isLegalMove(i)){
+                KalahState copy = new KalahState(a);
+                copy.doMove(i);
+                if (copy.getSideToMove() == KalahState.Player.SOUTH){
+                    bestState = 1000000000;
+                    state = minmax(copy,--depth,alpha,beta);
+                    bestState = Math.min(bestState,state);
+                    beta = Math.min(beta,bestState);
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+                else {
+                    bestState = -1000000000;
+                    state = minmax(copy, --depth,alpha,beta);
+                    bestState = Math.max(bestState, state);
+                    alpha = Math.max(alpha, bestState);
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+            }
+        }
 
-        return a;
+        return bestState;
     }
 
-    private void max(KalahState a){
-        min(a);
-    }
-
-    private void min(KalahState a){
-        max(a);
+    public int evaluation(KalahState a){
+        if(a.getSideToMove() == KalahState.Player.SOUTH){
+            return a.getHouseSumSouth() - a.getHouseSumNorth();
+        }
+        else{
+            return a.getHouseSumNorth() - a.getHouseSumSouth();
+        }
     }
 
 
 
     public static void main(String[] args) throws IOException {
 
-        KalahState state = new KalahState(6, 4);
+    /*    KalahState state = new KalahState(6, 4);
         var list = state.getMoves();
         //System.out.println(list);
         KalahState copy = new KalahState(state);
@@ -63,7 +109,7 @@ class Agent extends info.kwarc.kalah.Agent {
         copy.doMove(2);
         System.out.println(test);
         //System.out.println(copy);
-        list = copy.getMoves();
+        list = copy.getMoves();*/
         //System.out.println(list);
  /*       List<KalahState> store = new ArrayList<>();
         for (Integer integer : list) {
@@ -74,6 +120,6 @@ class Agent extends info.kwarc.kalah.Agent {
         for (KalahState state1 : store){
             System.out.println(state1);
         }*/
-        //new Agent().run();
+        new Agent().run();
     }
 }
