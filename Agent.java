@@ -53,29 +53,32 @@ class Agent extends info.kwarc.kalah.Agent {
     private int minmax(KalahState a, int depth, int alpha, int beta) {
         int bestState = 0;
         int state;
-        if(depth <= 0) return  evaluation(a);
-        bestState = a.getSideToMove() == KalahState.Player.SOUTH ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        KalahState.Player player1;
+        if(a.getSideToMove() == KalahState.Player.SOUTH){
+            player1 = KalahState.Player.SOUTH;
+        }else{
+            player1 = KalahState.Player.NORTH;
+        }
+        if(depth <= 0) return  evaluation(a,player1);
+        //bestState = (a.getSideToMove() == KalahState.Player.SOUTH) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         for(int i = 0; i<a.getBoardSize();i++){
             if(a.isLegalMove(i)){
                 KalahState copy = new KalahState(a);
                 copy.doMove(i);
-                if (copy.getSideToMove() == KalahState.Player.SOUTH){
-                    //bestState = Integer.MAX_VALUE;
+                if (copy.getSideToMove() == player1){
+                    bestState = -1000000000;
                     state = minmax(copy,--depth,alpha,beta);
-                    bestState = Math.min(bestState,state);
-                    beta = Math.min(beta,bestState);
-                    if(beta <= alpha){
-                        break;
-                    }
+                    bestState = Math.max(bestState,state);
+                    alpha = Math.min(alpha,bestState);
                 }
                 else {
-                    //bestState = -1000000000;
+                    bestState = 1000000000;
                     state = minmax(copy, --depth,alpha,beta);
-                    bestState = Math.max(bestState, state);
-                    alpha = Math.max(alpha, bestState);
-                    if(beta <= alpha){
-                        break;
-                    }
+                    bestState = Math.min(bestState, state);
+                    beta = Math.max(beta, bestState);
+                }
+                if(beta <= alpha){
+                    break;
                 }
             }
         }
@@ -83,17 +86,11 @@ class Agent extends info.kwarc.kalah.Agent {
         return bestState;
     }
 
-    public int evaluation(KalahState a){
-        if(a.getSideToMove() == KalahState.Player.SOUTH){
-            if(a.getHouseSumSouth() > a.totalSeeds() / 2){
-                return Integer.MAX_VALUE;
-            }
+    public int evaluation(KalahState a,KalahState.Player player){
+        if(player == KalahState.Player.SOUTH){
             return a.getHouseSumSouth() - a.getHouseSumNorth();
         }
         else{
-            if(a.getHouseSumNorth() > a.totalSeeds() / 2){
-                return  Integer.MAX_VALUE;
-            }
             return a.getHouseSumNorth() - a.getHouseSumSouth();
         }
     }
