@@ -47,7 +47,12 @@ class Agent extends info.kwarc.kalah.Agent {
             }
             depth++;
         }
-        submitMove(bestMove);
+        if(ks.isLegalMove(bestMove)){
+            submitMove(bestMove);
+        }
+        else{
+            submitMove(ks.randomLegalMove());
+        }
     }
 
     private int minmax(KalahState a, int depth, int alpha, int beta) {
@@ -85,15 +90,15 @@ class Agent extends info.kwarc.kalah.Agent {
 
     public int evaluation(KalahState a){
         if(a.getSideToMove() == KalahState.Player.SOUTH){
-            if(a.getHouseSumSouth() > a.totalSeeds() / 2){
+           /* if(a.getHouseSumSouth() > a.totalSeeds() / 2){
                 return Integer.MAX_VALUE;
-            }
+            }*/
             return a.getHouseSumSouth() - a.getHouseSumNorth();
         }
         else{
-            if(a.getHouseSumNorth() > a.totalSeeds() / 2){
+           /* if(a.getHouseSumNorth() > a.totalSeeds() / 2){
                 return  Integer.MAX_VALUE;
-            }
+            }*/
             return a.getHouseSumNorth() - a.getHouseSumSouth();
         }
     }
