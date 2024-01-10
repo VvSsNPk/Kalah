@@ -59,28 +59,22 @@ class Agent extends info.kwarc.kalah.Agent {
     private int minmax(KalahState a, int depth, int alpha, int beta, MINMAX minmax) {
         int bestState = 0;
         int state;
-        KalahState.Player player1;
-        if(a.getSideToMove() == KalahState.Player.SOUTH){
-            player1 = KalahState.Player.SOUTH;
-        }else{
-            player1 = KalahState.Player.NORTH;
-        }
-        if(depth <= 0) return  evaluation(a,player1);
+        if(depth <= 0) return  evaluation(a,minmax);
         //bestState = (a.getSideToMove() == KalahState.Player.SOUTH) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         for(int i = 0; i<a.getBoardSize();i++){
             if(a.isLegalMove(i)){
                 KalahState copy = new KalahState(a);
                 copy.doMove(i);
-                if (minmax == MINMAX.MAX){
+                if (minmax == MINMAX.MIN){
                     bestState = -1000000000;
                     state = minmax(copy,--depth,alpha,beta, minmax);
-                    bestState = Math.max(bestState,state);
+                    bestState = Math.min(bestState,state);
                     alpha = Math.min(alpha,bestState);
                 }
                 else {
                     bestState = 1000000000;
                     state = minmax(copy, --depth,alpha,beta, minmax);
-                    bestState = Math.min(bestState, state);
+                    bestState = Math.max(bestState, state);
                     beta = Math.max(beta, bestState);
                 }
                 if(beta <= alpha){
@@ -92,22 +86,30 @@ class Agent extends info.kwarc.kalah.Agent {
         return bestState;
     }
 
-    public int evaluation(KalahState a,KalahState.Player player){
-        if(player == KalahState.Player.SOUTH){
-            return a.getHouseSumSouth() - a.getHouseSumNorth();
-        }
-        else{
-            return a.getHouseSumNorth() - a.getHouseSumSouth();
+    public int evaluation(KalahState a,MINMAX minmax){
+        int eval = a.getHouseSumSouth() -a.getHouseSumNorth();
+        if(minmax == MINMAX.MAX){
+            if(eval > 0){
+                return eval;
+            }else{
+                return -eval;
+            }
+        }else{
+            if(eval < 0){
+                return eval;
+            }else{
+                return  -eval;
+            }
         }
     }
 
 
 
     public static void main(String[] args) throws IOException {
-        //new Agent().run();
-        KalahState ks = new KalahState(8,8);
-        System.out.println(ks.getSideToMove());
-        ks.doMove(1);
+        new Agent().run();
+//        KalahState ks = new KalahState(8,8);
+//        System.out.println(ks.getSideToMove());
+//        ks.doMove(1);
     }
 
     public enum MINMAX{
