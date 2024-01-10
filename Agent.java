@@ -29,7 +29,21 @@ class Agent extends info.kwarc.kalah.Agent {
 
     @Override
     public void search(KalahState ks) throws IOException {
-       submitMove(ks.randomLegalMove());
+        int  depth = 1;
+        int final_move = Integer.MIN_VALUE;
+        do {
+            int move = maxvalue(ks, depth, Integer.MAX_VALUE, Integer.MIN_VALUE);
+            if (move > final_move) {
+                final_move = move;
+            }
+        } while (!shouldStop());
+        if(ks.isLegalMove(final_move)){
+            submitMove(final_move);
+            sendComment("Legal found");
+        }else{
+            submitMove(ks.randomLegalMove());
+            sendComment("random");
+        }
     }
 
     private int minmax(KalahState a, int depth, int alpha, int beta) {
@@ -74,8 +88,8 @@ class Agent extends info.kwarc.kalah.Agent {
             if(val > 0) return val;
             else return -val;
         }else{
-            if(val<0) return val;
-            else return -val;
+            if(val<0) return -val;
+            else return val;
         }
 
     }
@@ -83,7 +97,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     public static void main(String[] args) throws IOException {
-        //new Agent().run();
+        new Agent().run();
 //        KalahState ks = new KalahState(8,8);
 //        System.out.println(ks.getSideToMove());
 //        ks.doMove(1);
