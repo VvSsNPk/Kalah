@@ -38,16 +38,38 @@ class Agent extends info.kwarc.kalah.Agent {
 
     }
 
-    private void maxvalue(KalahState a, int depth, int alpha, int beta){
-
+    private int maxvalue(KalahState a, int depth, int alpha, int beta){
+            if (depth == 0) return evaluation(a);
+            int maxVal = Integer.MIN_VALUE;
+            for(Integer n: a.getMoves()){
+                KalahState copy = new KalahState(a);
+                copy.doMove(n);
+                depth = depth -1;
+                int store = minvalue(copy, depth, alpha, beta);
+                if(store > maxVal){
+                    maxVal = store;
+                }
+            }
+        return maxVal;
     }
 
-    private void minvalue(KalahState a, int depth,int alpha, int beta){
-
+    private int minvalue(KalahState a, int depth,int alpha, int beta){
+        if (depth == 0) return evaluation(a);
+        int minVal = Integer.MAX_VALUE;
+        for(Integer n : a.getMoves()){
+            KalahState copy = new KalahState(a);
+            copy.doMove(n);
+            depth = depth -1;
+            int store = maxvalue(copy,depth,alpha,beta);
+            if(store < minVal){
+                minVal = store;
+            }
+        }
+        return minVal;
     }
 
     public int evaluation(KalahState a){
-        return 0;
+        return a.getHouseSumNorth()-a.getHouseSumSouth();
     }
 
 
