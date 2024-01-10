@@ -31,25 +31,12 @@ class Agent extends info.kwarc.kalah.Agent {
     public void search(KalahState ks) throws IOException {
         int  depth = 1;
         int final_move = Integer.MIN_VALUE;
+        int move_to;
         KalahState copier = new KalahState(ks);
-        do {
-            int move = maxvalue(ks, depth, Integer.MAX_VALUE, Integer.MIN_VALUE);
-            if (move > final_move) {
-                final_move = move;
-            }
-        } while (!shouldStop());
-        if(ks.isLegalMove(final_move)){
+        while(true){
+            for(Integer n : copier.getMoves()){
 
-            copier.doMove(final_move);
-            System.out.println(copier);
-            submitMove(final_move);
-            sendComment("Legal found");
-        }else{
-            int random = ks.randomLegalMove();
-            copier.doMove(random);
-            System.out.println(copier);
-            submitMove(random);
-            sendComment("random");
+            }
         }
     }
 
@@ -67,10 +54,11 @@ class Agent extends info.kwarc.kalah.Agent {
                 copy.doMove(n);
                 depth = depth -1;
                 int store = minvalue(copy, depth, alpha, beta);
-                if(store > maxVal){
-                    maxVal = store;
-                }
+                maxVal = Math.max(maxVal,store);
+                alpha = Math.max(maxVal,alpha);
+                if(store >= beta) break;
             }
+
         return maxVal;
     }
 
@@ -82,15 +70,21 @@ class Agent extends info.kwarc.kalah.Agent {
             copy.doMove(n);
             depth = depth -1;
             int store = maxvalue(copy,depth,alpha,beta);
-            if(store < minVal){
-                minVal = store;
-            }
+            minVal = Math.min(minVal,store);
+            beta = Math.min(minVal,beta);
+            if(store <= alpha) break;
         }
+
         return minVal;
     }
 
     public int evaluation(KalahState a,Integer n){
-        int val = a.getStoreNorth()-a.getStoreSouth();
+        int val;
+        if(a.getSideToMove() == KalahState.Player.SOUTH){
+            val = a.getHouseSum() - a.getStoreSouth();
+        }else{
+            val = a.getHouseSum() - a.getStoreNorth();
+        }
         if(n == 0){
             return Math.min(val,-val);
         }else{
