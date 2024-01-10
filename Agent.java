@@ -42,7 +42,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
     }
 
-    private void minvalue(KalahState a, int depth, int alpha, int beta){
+    private void minvalue(KalahState a, int depth,int alpha, int beta){
 
     }
 
