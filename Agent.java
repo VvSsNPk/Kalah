@@ -39,7 +39,7 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     private int maxvalue(KalahState a, int depth, int alpha, int beta){
-            if (depth == 0) return evaluation(a);
+            if (depth == 0) return evaluation(a, 1);
             int maxVal = Integer.MIN_VALUE;
             for(Integer n: a.getMoves()){
                 KalahState copy = new KalahState(a);
@@ -54,7 +54,7 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     private int minvalue(KalahState a, int depth,int alpha, int beta){
-        if (depth == 0) return evaluation(a);
+        if (depth == 0) return evaluation(a, 0);
         int minVal = Integer.MAX_VALUE;
         for(Integer n : a.getMoves()){
             KalahState copy = new KalahState(a);
@@ -68,8 +68,16 @@ class Agent extends info.kwarc.kalah.Agent {
         return minVal;
     }
 
-    public int evaluation(KalahState a){
-        return a.getHouseSumNorth()-a.getHouseSumSouth();
+    public int evaluation(KalahState a,Integer n){
+        int val = a.getHouseSumNorth()-a.getHouseSumSouth();
+        if(n == 0){
+            if(val > 0) return val;
+            else return -val;
+        }else{
+            if(val<0) return val;
+            else return -val;
+        }
+
     }
 
 
