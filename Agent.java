@@ -31,6 +31,7 @@ class Agent extends info.kwarc.kalah.Agent {
     public void search(KalahState ks) throws IOException {
         int  depth = 1;
         int final_move = Integer.MIN_VALUE;
+        KalahState copier = new KalahState(ks);
         do {
             int move = maxvalue(ks, depth, Integer.MAX_VALUE, Integer.MIN_VALUE);
             if (move > final_move) {
@@ -38,10 +39,16 @@ class Agent extends info.kwarc.kalah.Agent {
             }
         } while (!shouldStop());
         if(ks.isLegalMove(final_move)){
+
+            copier.doMove(final_move);
+            System.out.println(copier);
             submitMove(final_move);
             sendComment("Legal found");
         }else{
-            submitMove(ks.randomLegalMove());
+            int random = ks.randomLegalMove();
+            copier.doMove(random);
+            System.out.println(copier);
+            submitMove(random);
             sendComment("random");
         }
     }
@@ -83,7 +90,7 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     public int evaluation(KalahState a,Integer n){
-        int val = a.getHouseSumNorth()-a.getHouseSumSouth();
+        int val = a.getStoreNorth()-a.getStoreSouth();
         if(n == 0){
             if(val > 0) return val;
             else return -val;
