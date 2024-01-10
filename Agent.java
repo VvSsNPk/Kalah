@@ -92,11 +92,9 @@ class Agent extends info.kwarc.kalah.Agent {
     public int evaluation(KalahState a,Integer n){
         int val = a.getStoreNorth()-a.getStoreSouth();
         if(n == 0){
-            if(val > 0) return val;
-            else return -val;
+            return Math.min(val,-val);
         }else{
-            if(val<0) return -val;
-            else return val;
+            return Math.max(val,-val);
         }
 
     }
