@@ -89,17 +89,10 @@ class Agent extends info.kwarc.kalah.Agent {
     public int evaluation(KalahState a,MINMAX minmax){
         int eval = a.getStoreSouth() -a.getStoreNorth();
         if(minmax == MINMAX.MAX){
-            if(eval > 0){
-                return eval;
-            }else{
-                return -eval;
+            return Math.max(eval,-eval);
             }
-        }else{
-            if(eval < 0){
-                return eval;
-            }else{
-                return  -eval;
-            }
+        else{
+            return Math.min(eval,-eval);
         }
     }
 
