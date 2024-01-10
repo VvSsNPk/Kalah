@@ -33,12 +33,18 @@ class Agent extends info.kwarc.kalah.Agent {
         int bestState = Integer.MIN_VALUE;
         int state;
         int depth = 1;
+        MINMAX south;
+        if(ks.getSideToMove() == KalahState.Player.SOUTH){
+            south = MINMAX.MAX;
+        }else{
+            south = MINMAX.MIN;
+        }
         for(Integer a : ks.getMoves()){
             while (!shouldStop()) {
                 if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
-                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, south);
                     if (state > bestState) {
                         bestState = state;
                         bestMove = a;
@@ -50,7 +56,7 @@ class Agent extends info.kwarc.kalah.Agent {
         submitMove(bestMove);
     }
 
-    private int minmax(KalahState a, int depth, int alpha, int beta) {
+    private int minmax(KalahState a, int depth, int alpha, int beta, MINMAX minmax) {
         int bestState = 0;
         int state;
         KalahState.Player player1;
@@ -65,15 +71,15 @@ class Agent extends info.kwarc.kalah.Agent {
             if(a.isLegalMove(i)){
                 KalahState copy = new KalahState(a);
                 copy.doMove(i);
-                if (copy.getSideToMove() == player1){
+                if (minmax == MINMAX.MAX){
                     bestState = -1000000000;
-                    state = minmax(copy,--depth,alpha,beta);
+                    state = minmax(copy,--depth,alpha,beta, minmax);
                     bestState = Math.max(bestState,state);
                     alpha = Math.min(alpha,bestState);
                 }
                 else {
                     bestState = 1000000000;
-                    state = minmax(copy, --depth,alpha,beta);
+                    state = minmax(copy, --depth,alpha,beta, minmax);
                     bestState = Math.min(bestState, state);
                     beta = Math.max(beta, bestState);
                 }
@@ -98,6 +104,14 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     public static void main(String[] args) throws IOException {
-        new Agent().run();
+        //new Agent().run();
+        KalahState ks = new KalahState(8,8);
+        System.out.println(ks.getSideToMove());
+        ks.doMove(1);
+    }
+
+    public enum MINMAX{
+        MIN,
+        MAX,
     }
 }
