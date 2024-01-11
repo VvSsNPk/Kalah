@@ -31,13 +31,20 @@ class Agent extends info.kwarc.kalah.Agent {
     public void search(KalahState ks) throws IOException {
         int  depth = 1;
         int final_move = Integer.MIN_VALUE;
-        int move_to;
-        KalahState copier = new KalahState(ks);
-        while(true){
-            for(Integer n : copier.getMoves()){
-
+        int move_to = ks.randomLegalMove();
+        do {
+            KalahState copier = new KalahState(ks);
+            for (Integer n : ks.getMoves()) {
+                ks.doMove(n);
+                int min = minvalue(ks, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                if (min > final_move) {
+                    final_move = min;
+                    move_to = n;
+                }
             }
-        }
+            depth++;
+        } while (!shouldStop());
+        submitMove(move_to);
     }
 
     private int minmax(KalahState a, int depth, int alpha, int beta) {
@@ -55,8 +62,11 @@ class Agent extends info.kwarc.kalah.Agent {
                 depth = depth -1;
                 int store = minvalue(copy, depth, alpha, beta);
                 maxVal = Math.max(maxVal,store);
-                alpha = Math.max(maxVal,alpha);
-                if(store >= beta) break;
+                if(maxVal >= beta){
+                    return maxVal;
+                }
+                alpha = Math.max(alpha,maxVal);
+
             }
 
         return maxVal;
@@ -71,20 +81,18 @@ class Agent extends info.kwarc.kalah.Agent {
             depth = depth -1;
             int store = maxvalue(copy,depth,alpha,beta);
             minVal = Math.min(minVal,store);
-            beta = Math.min(minVal,beta);
-            if(store <= alpha) break;
+            if(minVal <= alpha){
+                return minVal;
+
+            }
+            beta = Math.min(beta, minVal);
         }
 
         return minVal;
     }
 
     public int evaluation(KalahState a,Integer n){
-        int val;
-        if(a.getSideToMove() == KalahState.Player.SOUTH){
-            val = a.getHouseSum() - a.getStoreSouth();
-        }else{
-            val = a.getHouseSum() - a.getStoreNorth();
-        }
+        int val = a.getStoreSouth()-a.getStoreNorth();
         if(n == 0){
             return Math.min(val,-val);
         }else{
