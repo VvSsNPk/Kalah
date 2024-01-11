@@ -34,10 +34,10 @@ class Agent extends info.kwarc.kalah.Agent {
         int move_to = ks.randomLegalMove();
         do {
             KalahState copier = new KalahState(ks);
-            for (Integer n : ks.getMoves()) {
+            for (Integer n : copier.getMoves()) {
                 ks.doMove(n);
-                int min = minvalue(ks, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                if (min > final_move) {
+                int min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                if (min >= final_move) {
                     final_move = min;
                     move_to = n;
                 }
