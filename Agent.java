@@ -33,8 +33,9 @@ class Agent extends info.kwarc.kalah.Agent {
         int final_move = Integer.MIN_VALUE;
         int move_to = ks.randomLegalMove();
         do {
-            KalahState copier = new KalahState(ks);
-            for (Integer n : copier.getMoves()) {
+
+            for (Integer n : ks.getMoves()) {
+                KalahState copier = new KalahState(ks);
                 ks.doMove(n);
                 int min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 if (min >= final_move) {
@@ -92,15 +93,38 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     public int evaluation(KalahState a,Integer n){
-        int val = a.getStoreSouth()-a.getStoreNorth();
-        if(n == 0){
-            return Math.min(val,-val);
-        }else{
-            return Math.max(val,-val);
+        int val = 0;
+        if(n == 1){
+            if(a.getSideToMove() == KalahState.Player.NORTH){
+                val = a.getHouseSum()-a.getStoreNorth();
+            }else{
+                val = a.getHouseSum() - a.getStoreSouth();
+            }
+        }else if(n == 0){
+            if(a.getSideToMove() == KalahState.Player.NORTH){
+                val = a.getHouseSum()-a.getStoreNorth();
+            }else{
+                val = a.getHouseSum()-a.getStoreSouth();
+            }
         }
-
+        return val;
     }
 
+    private int no_of_captures(KalahState ks){
+        int count = 0;
+        for(int i : ks.getMoves()){
+            if(ks.isCaptureMove(i)) count++;
+        }
+        return  count;
+    }
+
+    private int no_of_doubles(KalahState ks){
+        int count = 0;
+        for(int i: ks.getMoves()){
+            if(ks.isDoubleMove(i))count++;
+        }
+        return count;
+    }
 
 
     public static void main(String[] args) throws IOException {
