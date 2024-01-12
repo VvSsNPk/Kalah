@@ -48,12 +48,6 @@ class Agent extends info.kwarc.kalah.Agent {
         submitMove(move_to);
     }
 
-    private int minmax(KalahState a, int depth, int alpha, int beta) {
-
-        return 0;
-
-    }
-
     private int maxvalue(KalahState a, int depth, int alpha, int beta){
             if (depth == 0) return evaluation(a, 1);
             int maxVal = Integer.MIN_VALUE;
@@ -100,7 +94,7 @@ class Agent extends info.kwarc.kalah.Agent {
             }else{
                 val = a.getHouseSum() - a.getStoreSouth();
             }
-        }else if(n == 0){
+        }else {
             if(a.getSideToMove() == KalahState.Player.NORTH){
                 val = a.getHouseSum()-a.getStoreNorth();
             }else{
