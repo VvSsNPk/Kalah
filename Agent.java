@@ -97,7 +97,9 @@ class Agent extends info.kwarc.kalah.Agent {
         }
         else{
         int minVal = Integer.MAX_VALUE;
-        for(Integer n : move_ordering(a)){
+        ArrayList<Integer> moves = a.getMoves();
+        move_ordering(a,moves);
+        for(Integer n : moves){
             KalahState copy = new KalahState(a);
             copy.doMove(n);
             int store = maxvalue(copy,depth-1,alpha,beta);
@@ -142,8 +144,8 @@ class Agent extends info.kwarc.kalah.Agent {
         return eval;
     }
 
-    private void move_ordering(KalahState ks){
-        ArrayList<Integer> moves = ks.getMoves();
+    private void move_ordering(KalahState ks, ArrayList<Integer> moves){
+
         Comparator<Integer> customComparator = (a, b) -> {
             if (ks.isCaptureMove(a) && !ks.isCaptureMove(b)) {
                 return -1; // a comes before b
