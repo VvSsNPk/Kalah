@@ -13,11 +13,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") != null
+        super(System.getenv("USE_WEBSOCKET") == null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
               "NoobMax Algorithm", // agent name
@@ -38,19 +38,24 @@ class Agent extends info.kwarc.kalah.Agent {
             for (Integer n : ks.getMoves()) {
                 KalahState copier = new KalahState(ks);
                 copier.doMove(n);
-                int min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                int min;
+                if(ks.isDoubleMove(n) || ks.isCaptureMove(n)){
+                    min = maxvalue(copier,depth,Integer.MIN_VALUE,Integer.MAX_VALUE);
+                }else {
+                    min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                }
                 if (min >= final_move && ks.isLegalMove(n)) {
                     final_move = min;
                     move_to = n;
                 }
             }
-            String comment = "evaluation : " + final_move + "\n" +
-                    "final move : " + move_to + "\n" +
-                    "depth : " + depth ;
-            sendComment(comment);
             submitMove(move_to);
             depth++;
         } while (!shouldStop());
+        String comment = "evaluation : " + final_move + "\n" +
+                "final move : " + move_to + "\n" +
+                "depth : " + depth ;
+        sendComment(comment);
 
 
 
