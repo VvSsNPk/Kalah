@@ -142,18 +142,24 @@ class Agent extends info.kwarc.kalah.Agent {
         return eval;
     }
 
-    private ArrayList<Integer> move_ordering(KalahState ks){
+    private void move_ordering(KalahState ks){
         ArrayList<Integer> moves = ks.getMoves();
-        for(int i = 0; i< moves.size(); i++){
-            int j = 0;
-            if(ks.isDoubleMove(moves.get(i)) || ks.isCaptureMove(moves.get(i))){
-                int temp = moves.get(i);
-                moves.set(i,moves.get(j));
-                moves.set(j,temp);
-                j = j + 1;
+        Comparator<Integer> customComparator = (a, b) -> {
+            if (ks.isCaptureMove(a) && !ks.isCaptureMove(b)) {
+                return -1; // a comes before b
+            } else if (ks.isDoubleMove(a) && !ks.isDoubleMove(b)) {
+                return -1; // a comes before b
+            } else if (ks.isCaptureMove(b) && !ks.isCaptureMove(a)) {
+                return 1; // b comes before a
+            } else if (ks.isDoubleMove(b) && !ks.isDoubleMove(a)) {
+                return 1; // b comes before a
+            } else {
+                return 0; // no change in order
             }
-        }
-        return moves;
+        };
+
+        // Use the custom comparator to reorder the ArrayList
+        moves.sort(customComparator);
     }
 
 
