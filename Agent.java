@@ -39,7 +39,7 @@ class Agent extends info.kwarc.kalah.Agent {
                 KalahState copier = new KalahState(ks);
                 copier.doMove(n);
                 int min;
-                if(ks.isDoubleMove(n) || ks.isCaptureMove(n)){
+                if(ks.isDoubleMove(n)){
                     min = maxvalue(copier,depth,Integer.MIN_VALUE,Integer.MAX_VALUE);
                 }else {
                     min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -140,6 +140,20 @@ class Agent extends info.kwarc.kalah.Agent {
             }
         }
         return eval;
+    }
+
+    private ArrayList<Integer> move_ordering(KalahState ks){
+        ArrayList<Integer> moves = ks.getMoves();
+        for(int i = 0; i< moves.size(); i++){
+            int j = 0;
+            if(ks.isDoubleMove(moves.get(i)) || ks.isCaptureMove(moves.get(i))){
+                int temp = moves.get(i);
+                moves.set(i,moves.get(j));
+                moves.set(j,temp);
+                j = j + 1;
+            }
+        }
+        return moves;
     }
 
 
