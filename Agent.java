@@ -64,10 +64,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private int maxvalue(KalahState a, int depth, int alpha, int beta){
             if (depth <= 0){
                 if(a.getSideToMove() == KalahState.Player.SOUTH){
-
-                    return a.getStoreLead();
+                    if(a.result() == KalahState.GameResult.KNOWN_WIN|| a.result()== KalahState.GameResult.WIN) return Integer.MAX_VALUE;
+                    else return a.getStoreLead();
                 } else{
-                    return -a.getStoreLead();
+                    if(a.result() == KalahState.GameResult.KNOWN_LOSS || a.result() == KalahState.GameResult.LOSS) return Integer.MIN_VALUE;
+                    else return -a.getStoreLead();
                 }
             }
             else{
@@ -90,9 +91,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private int minvalue(KalahState a, int depth,int alpha, int beta){
         if (depth <= 0){
             if(a.getSideToMove() == KalahState.Player.NORTH){
-                return -a.getStoreLead();
+                if(a.result() == KalahState.GameResult.KNOWN_LOSS || a.result() == KalahState.GameResult.LOSS) return Integer.MAX_VALUE;
+                else return -a.getStoreLead();
             }else {
-                return a.getStoreLead();
+                if(a.result() == KalahState.GameResult.KNOWN_WIN || a.result() == KalahState.GameResult.WIN) return Integer.MIN_VALUE;
+                else return a.getStoreLead();
             }
         }
         else{
