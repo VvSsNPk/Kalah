@@ -13,11 +13,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") == null
+        super(System.getenv("USE_WEBSOCKET") != null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
               "NoobMax Algorithm", // agent name
