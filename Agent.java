@@ -44,6 +44,7 @@ class Agent extends info.kwarc.kalah.Agent {
                 }else {
                     min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 }
+                //if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) min = Integer.MAX_VALUE;
                 if (min >= final_move && ks.isLegalMove(n)) {
                     final_move = min;
                     move_to = n;
@@ -63,13 +64,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
     private int maxvalue(KalahState a, int depth, int alpha, int beta){
             if (depth <= 0){
-                if(a.getSideToMove() == KalahState.Player.SOUTH){
-                    if(a.result() == KalahState.GameResult.KNOWN_WIN|| a.result()== KalahState.GameResult.WIN) return Integer.MAX_VALUE;
-                    else return a.getStoreLead();
-                } else{
-                    if(a.result() == KalahState.GameResult.KNOWN_LOSS || a.result() == KalahState.GameResult.LOSS) return Integer.MIN_VALUE;
-                    else return -a.getStoreLead();
-                }
+               return a.getStoreSouth() - a.getStoreNorth();
             }
             else{
             int maxVal = Integer.MIN_VALUE;
@@ -90,13 +85,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
     private int minvalue(KalahState a, int depth,int alpha, int beta){
         if (depth <= 0){
-            if(a.getSideToMove() == KalahState.Player.NORTH){
-                if(a.result() == KalahState.GameResult.KNOWN_LOSS || a.result() == KalahState.GameResult.LOSS) return Integer.MAX_VALUE;
-                else return -a.getStoreLead();
-            }else {
-                if(a.result() == KalahState.GameResult.KNOWN_WIN || a.result() == KalahState.GameResult.WIN) return Integer.MIN_VALUE;
-                else return a.getStoreLead();
-            }
+            return a.getStoreSouth()-a.getStoreNorth();
         }
         else{
         int minVal = Integer.MAX_VALUE;
@@ -116,8 +105,8 @@ class Agent extends info.kwarc.kalah.Agent {
 
     private ArrayList<Integer> move_ordering(KalahState ks){
         ArrayList<Integer> moves = ks.getMoves();
+        int j = 0;
         for(int i = 0; i< moves.size(); i++){
-            int j = 0;
             if(ks.isDoubleMove(moves.get(i)) || ks.isCaptureMove(moves.get(i))){
                 int temp = moves.get(i);
                 moves.set(i,moves.get(j));
