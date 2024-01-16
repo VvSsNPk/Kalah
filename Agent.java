@@ -107,42 +107,11 @@ class Agent extends info.kwarc.kalah.Agent {
             minVal = Math.min(minVal,store);
             if(minVal <= alpha){
                 return minVal;
-
             }
             beta = Math.min(beta, minVal);
         }
 
         return minVal;}
-    }
-
-    public int evaluation(KalahState a,Integer n){
-            if(n == 0){
-                return -a.getStoreLead();
-            }else {
-                return a.getStoreLead();
-            }
-
-    }
-
-    private int double_or_capture(KalahState ks){
-        int eval = Integer.MIN_VALUE;
-
-        for(int i: ks.getMoves()){
-            KalahState copier = new KalahState(ks);
-            if(ks.isDoubleMove(i) || ks.isCaptureMove(i)){
-                copier.doMove(i);
-                int store = 0;
-                if(ks.getSideToMove()==KalahState.Player.SOUTH){
-                    store = copier.getStoreLead();
-                }else{
-                    store = -copier.getStoreLead();
-                }
-                if(store > eval){
-                    eval = store;
-                }
-            }
-        }
-        return eval;
     }
 
     private ArrayList<Integer> move_ordering(KalahState ks){
