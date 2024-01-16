@@ -72,7 +72,9 @@ class Agent extends info.kwarc.kalah.Agent {
             }
             else{
             int maxVal = Integer.MIN_VALUE;
-            for(Integer n: move_ordering(a)){
+            ArrayList<Integer> moves = a.getMoves();
+            move_ordering(a,moves);
+            for(Integer n: moves){
                 KalahState copy = new KalahState(a);
                 copy.doMove(n);
                 int store = minvalue(copy, depth-1, alpha, beta);
