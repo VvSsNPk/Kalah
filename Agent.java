@@ -117,6 +117,46 @@ class Agent extends info.kwarc.kalah.Agent {
         return moves;
     }
 
+    private double minmax_search(KalahState game_state,int initial_depth, int final_depth, double alpha, double beta){
+        KalahState.GameResult result = game_state.result();
+        if(result != KalahState.GameResult.UNDECIDED){
+            if(result == KalahState.GameResult.KNOWN_WIN||result== KalahState.GameResult.WIN){
+                return Double.POSITIVE_INFINITY;
+            }else if(result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS){
+                return Double.NEGATIVE_INFINITY;
+            }else{
+                return 0;
+            }
+        }else{
+            if(initial_depth == final_depth){
+                return game_state.getStoreSouth() - game_state.getStoreNorth();
+            }else{
+                Double best_eval = null;
+
+                for(Integer move: game_state.getMoves()){
+                    KalahState copy = new KalahState(game_state);
+                    KalahState.Player before = copy.getSideToMove();
+                    copy.doMove(move);
+                    double eval = minmax_search(copy,initial_depth+1,final_depth,alpha,beta);
+                    if(before != copy.getSideToMove()){
+                        eval = -eval;
+                    }
+                    if(best_eval == null || eval > best_eval){
+                        best_eval = eval;
+                    }
+                    alpha = Math.max(alpha,eval);
+                    beta = Math.min(beta,eval);
+                    if(alpha < beta){
+                        return best_eval;
+                    }
+                }
+                return best_eval;
+            }
+        }
+
+
+    }
+
 
     public static void main(String[] args) throws IOException {
 
