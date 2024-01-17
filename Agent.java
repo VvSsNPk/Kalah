@@ -146,7 +146,7 @@ class Agent extends info.kwarc.kalah.Agent {
                     }
                     alpha = Math.max(alpha,eval);
                     beta = Math.min(beta,eval);
-                    if(alpha < beta){
+                    if(beta <= alpha){
                         return best_eval;
                     }
                 }
