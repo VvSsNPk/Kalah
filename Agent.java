@@ -13,11 +13,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") != null
+        super(System.getenv("USE_WEBSOCKET") == null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
               "NoobMax Algorithm", // agent name
@@ -65,23 +65,25 @@ class Agent extends info.kwarc.kalah.Agent {
 
     }
     private int evaluateKalahState(KalahState a, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
+        int bestValue = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         if (depth <= 0 || game_over(a)) {
             KalahState.GameResult result = a.result();
+            if(result != KalahState.GameResult.UNDECIDED) {
+                if (result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) {
+                    return isMaximizingPlayer ? 100000000 : -100000000;
+                } else if (result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS) {
+                    return isMaximizingPlayer ? -100000000 : 100000000;
+                }
+            }else {
+                return 4 * (a.getStoreSouth() - a.getStoreNorth()) + 2 * (no_of_doubles(a)) + 2 * total_capture(a);
 
-            if (result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) {
-                return isMaximizingPlayer ? 100000000 : -100000000;
-            } else if (result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS) {
-                return isMaximizingPlayer ? -100000000 : 100000000;
             }
-
-            return a.getStoreSouth() - a.getStoreNorth();
         } else {
-            int bestValue = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
             for (Integer n : move_ordering(a)) {
                 KalahState copy = new KalahState(a);
                 copy.doMove(n);
-                isMaximizingPlayer = copy.getSideToMove() == KalahState.Player.SOUTH;
+                // isMaximizingPlayer = copy.getSideToMove() == KalahState.Player.SOUTH;
                 int store;
                 if (isMaximizingPlayer) {
                     store = evaluateKalahState(copy, depth - 1, alpha, beta, false);
@@ -101,9 +103,8 @@ class Agent extends info.kwarc.kalah.Agent {
                     return bestValue;
                 }
             }
-
-            return bestValue;
         }
+        return bestValue;
     }
 
 
@@ -148,12 +149,7 @@ class Agent extends info.kwarc.kalah.Agent {
         KalahState.Player player;
         for(Integer n : a.getMoves()){
             if(a.isCaptureMove(n)){
-                if(a.getSideToMove() == KalahState.Player.SOUTH){
-                    player = KalahState.Player.NORTH;
-                }else{
-                    player = KalahState.Player.SOUTH;
-                }
-                capture = capture + a.getHouse(player,n);
+                capture ++;
             }
         }
         return capture;
