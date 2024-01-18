@@ -11,13 +11,14 @@ import java.util.logging.Logger;
 // legal move.  You may use this as a foundation.
 class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
+    private final TransportationTable transportationTable;
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") == null
+        super(System.getenv("USE_WEBSOCKET") != null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
               "NoobMax Algorithm", // agent name
@@ -26,6 +27,7 @@ class Agent extends info.kwarc.kalah.Agent {
               "GODISALSOHUMAN", // agent token
               false  // suppress network
               );
+        this.transportationTable = new TransportationTable();
     }
 
     @Override
@@ -65,6 +67,11 @@ class Agent extends info.kwarc.kalah.Agent {
 
     }
     private int evaluateKalahState(KalahState a, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
+        int key = a.hashCode();
+        int cachedResult = transportationTable.lookup(key);
+        if(cachedResult != 0){
+            return cachedResult;
+        }
         int bestValue = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         if (depth <= 0 || game_over(a)) {
             KalahState.GameResult result = a.result();
@@ -94,6 +101,8 @@ class Agent extends info.kwarc.kalah.Agent {
                     bestValue = Math.min(bestValue, store);
                     beta = Math.min(beta, bestValue);
                 }
+
+                transportationTable.store(key,store);
 
                 if (bestValue >= beta && isMaximizingPlayer) {
                     return bestValue;

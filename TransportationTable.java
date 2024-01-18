@@ -14,6 +14,6 @@ public class TransportationTable {
     }
 
     public int lookup(int key){
-        return table.get(key);
+        return table.getOrDefault(key, 0);
     }
 }
