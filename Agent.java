@@ -84,22 +84,22 @@ class Agent extends info.kwarc.kalah.Agent {
             if(initial_depth >= final_depth || game_over(game_state)){
                 return game_state.getStoreSouth() - game_state.getStoreNorth();
             }else{
-                Double best_eval = null;
+                double best_eval = Double.NEGATIVE_INFINITY;
 
                 for(Integer move: move_ordering(game_state)){
                     KalahState copy = new KalahState(game_state);
                     copy.doMove(move);
                     double eval = minmax_search(copy,initial_depth+1,final_depth,alpha,beta);
-                    if(best_eval == null || eval > best_eval){
+                    if(eval > best_eval){
                         best_eval = eval;
                     }
-                    if(game_state.getSideToMove() == KalahState.Player.SOUTH) {
-                        alpha = Math.max(alpha, eval);
+                    if(copy.getSideToMove() == KalahState.Player.SOUTH) {
+                        alpha = Math.min(alpha, eval);
                     }else {
-                        beta = Math.min(beta, eval);
+                        beta = Math.max(beta, eval);
                     }
                     if(beta <= alpha){
-                        return best_eval;
+                        break;
                     }
                 }
                 return best_eval;
