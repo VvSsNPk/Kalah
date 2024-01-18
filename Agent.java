@@ -38,18 +38,21 @@ class Agent extends info.kwarc.kalah.Agent {
             for (Integer n : ks.getMoves()) {
                 KalahState copier = new KalahState(ks);
                 copier.doMove(n);
+                KalahState.Player player = copier.getSideToMove();
                 int min;
-                if(ks.isDoubleMove(n)){
-                    min = maxvalue(copier,depth,Integer.MIN_VALUE,Integer.MAX_VALUE);
+                if(player == KalahState.Player.SOUTH){
+                    min = evaluateKalahState(copier,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,true);
                 }else {
-                    min = minvalue(copier, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    min = evaluateKalahState(copier,depth,Integer.MIN_VALUE,Integer.MAX_VALUE,false);
                 }
-                //if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) min = Integer.MAX_VALUE;
                 if (min > final_move) {
                     final_move = min;
                     move_to = n;
                 }
             }
+            KalahState printer = new KalahState(ks);
+            printer.doMove(move_to);
+            System.out.println(printer);
             submitMove(move_to);
             depth++;
         } while (!shouldStop());
@@ -61,71 +64,48 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     }
+    private int evaluateKalahState(KalahState a, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
+        if (depth <= 0 || game_over(a)) {
+            KalahState.GameResult result = a.result();
 
-    private int maxvalue(KalahState a, int depth, int alpha, int beta){
-            if (depth <= 0 || game_over(a)){
-                KalahState.GameResult result = a.result();
-                if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN){
-                    return 100000000;
-                }else if(result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS){
-                    return -100000000;
-                }
-                //if(a.result() != KalahState.GameResult.UNDECIDED) eval = static_eval(a);
-               return a.getStoreSouth() - a.getStoreNorth();
+            if (result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) {
+                return isMaximizingPlayer ? 100000000 : -100000000;
+            } else if (result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS) {
+                return isMaximizingPlayer ? -100000000 : 100000000;
             }
-            else{
-            int maxVal = Integer.MIN_VALUE;
-            for(Integer n: move_ordering(a)){
+
+            return a.getStoreSouth() - a.getStoreNorth();
+        } else {
+            int bestValue = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+            for (Integer n : move_ordering(a)) {
                 KalahState copy = new KalahState(a);
                 copy.doMove(n);
+                isMaximizingPlayer = copy.getSideToMove() == KalahState.Player.SOUTH;
                 int store;
-                if(a.getSideToMove() == KalahState.Player.SOUTH){
-                    store = maxvalue(copy,depth-1,alpha,beta);
-                }else {
-                    store = minvalue(copy, depth - 1, alpha, beta);
+                if (isMaximizingPlayer) {
+                    store = evaluateKalahState(copy, depth - 1, alpha, beta, false);
+                    bestValue = Math.max(bestValue, store);
+                    alpha = Math.max(alpha, bestValue);
+                } else {
+                    store = evaluateKalahState(copy, depth - 1, alpha, beta, true);
+                    bestValue = Math.min(bestValue, store);
+                    beta = Math.min(beta, bestValue);
                 }
-                maxVal = Math.max(maxVal,store);
-                if(maxVal >= beta){
-                    return maxVal;
-                }
-                alpha = Math.max(alpha,maxVal);
 
+                if (bestValue >= beta && isMaximizingPlayer) {
+                    return bestValue;
+                }
+
+                if (bestValue <= alpha && !isMaximizingPlayer) {
+                    return bestValue;
+                }
             }
 
-        return maxVal;}
+            return bestValue;
+        }
     }
 
-    private int minvalue(KalahState a, int depth,int alpha, int beta){
-        if (depth <= 0 || game_over(a)){
-            KalahState.GameResult result = a.result();
-            if(result == KalahState.GameResult.KNOWN_WIN || result== KalahState.GameResult.WIN){
-                return -100000000;
-            }else if(result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS){
-                return 100000000;
-            }
-            //if(a.result() != KalahState.GameResult.UNDECIDED) eval = static_eval(a);
-            return a.getStoreSouth()-a.getStoreNorth();
-        }
-        else{
-        int minVal = Integer.MAX_VALUE;
-        for(Integer n : move_ordering(a)){
-            KalahState copy = new KalahState(a);
-            copy.doMove(n);
-            int store ;
-            if(a.getSideToMove() == KalahState.Player.NORTH){
-                store = minvalue(copy,depth-1,alpha,beta);
-            }else {
-                store = maxvalue(copy, depth - 1, alpha, beta);
-            }
-            minVal = Math.min(minVal,store);
-            if(minVal <= alpha){
-                return minVal;
-            }
-            beta = Math.min(beta, minVal);
-        }
-
-        return minVal;}
-    }
 
     private ArrayList<Integer> move_ordering(KalahState ks){
         ArrayList<Integer> moves = new ArrayList<>();
@@ -154,16 +134,29 @@ class Agent extends info.kwarc.kalah.Agent {
         return result == KalahState.GameResult.DRAW || result == KalahState.GameResult.LOSS || result == KalahState.GameResult.WIN;
     }
 
-    private int static_eval(KalahState a){
-        KalahState.GameResult result = a.result();
-        if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN){
-                return Integer.MAX_VALUE;
-            }else if(result == KalahState.GameResult.LOSS || result== KalahState.GameResult.KNOWN_LOSS){
-            return Integer.MIN_VALUE +1;
-        }else{
-            return 0;
+    private int no_of_doubles(KalahState a){
+        int count = 0;
+        for(Integer n: a.getMoves()){
+            if(a.isDoubleMove(n)){
+                count++;
+            }
         }
-
+        return count;
+    }
+    private int total_capture(KalahState a){
+        int capture = 0;
+        KalahState.Player player;
+        for(Integer n : a.getMoves()){
+            if(a.isCaptureMove(n)){
+                if(a.getSideToMove() == KalahState.Player.SOUTH){
+                    player = KalahState.Player.NORTH;
+                }else{
+                    player = KalahState.Player.SOUTH;
+                }
+                capture = capture + a.getHouse(player,n);
+            }
+        }
+        return capture;
     }
 
 
