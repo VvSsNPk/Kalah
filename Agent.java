@@ -33,18 +33,13 @@ class Agent extends info.kwarc.kalah.Agent {
         int bestState = Integer.MIN_VALUE;
         int state;
         int depth = 1;
-        MINMAX south;
-        if(ks.getSideToMove() == KalahState.Player.SOUTH){
-            south = MINMAX.MAX;
-        }else{
-            south = MINMAX.MIN;
-        }
+
         for(Integer a : ks.getMoves()){
             while (!shouldStop()) {
                 if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
-                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, south);
+                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE,true);
                     if (state > bestState) {
                         bestState = state;
                         bestMove = a;
@@ -56,44 +51,38 @@ class Agent extends info.kwarc.kalah.Agent {
         submitMove(bestMove);
     }
 
-    private int minmax(KalahState a, int depth, int alpha, int beta, MINMAX minmax) {
+    private int minmax(KalahState a, int depth, int alpha, int beta, boolean maximizingPlayer) {
         int bestState = 0;
         int state;
-        if(depth <= 0) return  evaluation(a,minmax);
-        //bestState = (a.getSideToMove() == KalahState.Player.SOUTH) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-        for(int i = 0; i<a.getBoardSize();i++){
-            if(a.isLegalMove(i)){
-                KalahState copy = new KalahState(a);
-                copy.doMove(i);
-                if (minmax == MINMAX.MIN){
-                    bestState = -1000000000;
-                    state = minmax(copy,--depth,alpha,beta, minmax);
-                    bestState = Math.min(bestState,state);
-                    alpha = Math.min(alpha,bestState);
-                }
-                else {
-                    bestState = 1000000000;
-                    state = minmax(copy, --depth,alpha,beta, minmax);
-                    bestState = Math.max(bestState, state);
-                    beta = Math.max(beta, bestState);
-                }
-                if(beta <= alpha){
-                    break;
+        if(depth == 0 || game_over(a)) {
+            return a.getStoreSouth()- a.getStoreNorth();
+        }
+        if(maximizingPlayer){
+            int value = Integer.MIN_VALUE;
+            for(Integer n : a.getMoves()){
+                value = Math.max(value,minmax(a,depth,alpha,beta,false));
+                alpha = Math.max(alpha,value);
+                if(value >= beta){
+                    return value;
                 }
             }
+            return value;
+        }else{
+            int value = Integer.MAX_VALUE;
+            for(Integer n : a.getMoves()){
+                value = Math.min(value,minmax(a,depth-1,alpha,beta,true));
+                beta = Math.min(beta,value);
+                if( value <= alpha) return value;
+            }
+            return value;
         }
 
-        return bestState;
     }
 
-    public int evaluation(KalahState a,MINMAX minmax){
-        int eval = a.getStoreSouth() -a.getStoreNorth();
-        if(minmax == MINMAX.MAX){
-            return Math.max(eval,-eval);
-            }
-        else{
-            return Math.min(eval,-eval);
-        }
+
+    private boolean game_over(KalahState state){
+        KalahState.GameResult result = state.result();
+        return result == KalahState.GameResult.LOSS || result == KalahState.GameResult.WIN || result == KalahState.GameResult.DRAW;
     }
 
 
@@ -105,8 +94,4 @@ class Agent extends info.kwarc.kalah.Agent {
 //        ks.doMove(1);
     }
 
-    public enum MINMAX{
-        MIN,
-        MAX,
-    }
 }
