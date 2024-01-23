@@ -30,29 +30,14 @@ class Agent extends info.kwarc.kalah.Agent {
 
     @Override
     public void search(KalahState ks) throws IOException {
-        int  depth = 1;
-        double final_move = Double.NEGATIVE_INFINITY;
-        int move_to = ks.randomLegalMove();
-        do {
-
-            for (Integer n : ks.getMoves()) {
-                KalahState copier = new KalahState(ks);
-                copier.doMove(n);
-                double min = minmax_search(copier,0,depth,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY);
-                //if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN) min = Integer.MAX_VALUE;
-                if (min >= final_move && ks.isLegalMove(n)) {
-                    final_move = min;
-                    move_to = n;
-                }
+        int depth = 1;
+        while(!shouldStop()){
+            int eval = minmax_search(ks,0,depth,Integer.MIN_VALUE,Integer.MAX_VALUE);
+            if(eval == Integer.MAX_VALUE || eval ==Integer.MIN_VALUE +1){
+                break;
             }
-            submitMove(move_to);
-            depth++;
-        } while (!shouldStop());
-        String comment = "evaluation : " + final_move + "\n" +
-                "final move : " + move_to + "\n" +
-                "depth : " + depth ;
-        sendComment(comment);
-
+            depth ++;
+        }
 
 
     }
@@ -70,40 +55,58 @@ class Agent extends info.kwarc.kalah.Agent {
         return moves;
     }
 
-    private double minmax_search(KalahState game_state,int initial_depth, int final_depth, double alpha, double beta){
-        KalahState.GameResult result = game_state.result();
-        if(result != KalahState.GameResult.UNDECIDED){
-            if(result == KalahState.GameResult.KNOWN_WIN||result== KalahState.GameResult.WIN){
-                return Double.POSITIVE_INFINITY;
-            }else if(result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS){
-                return Double.NEGATIVE_INFINITY;
-            }else{
-                return 0;
-            }
-        }else{
-            if(initial_depth >= final_depth || game_over(game_state)){
-                return game_state.getStoreSouth() - game_state.getStoreNorth();
-            }else{
-                double best_eval = Double.NEGATIVE_INFINITY;
-
-                for(Integer move: move_ordering(game_state)){
-                    KalahState copy = new KalahState(game_state);
-                    copy.doMove(move);
-                    double eval = minmax_search(copy,initial_depth+1,final_depth,alpha,beta);
-                    if(eval > best_eval){
-                        best_eval = eval;
-                    }
-                    if(copy.getSideToMove() == KalahState.Player.SOUTH) {
-                        alpha = Math.min(alpha, eval);
-                    }else {
-                        beta = Math.max(beta, eval);
-                    }
-                    if(beta <= alpha){
-                        break;
-                    }
+    private int minmax_search(KalahState game_state,int initial_depth, int final_depth, int alpha, int beta) throws IOException {
+            KalahState.GameResult result = game_state.result();
+            if(result != KalahState.GameResult.UNDECIDED){
+                if(result == KalahState.GameResult.KNOWN_WIN || result == KalahState.GameResult.WIN){
+                    return Integer.MAX_VALUE;
+                }else if(result == KalahState.GameResult.LOSS || result == KalahState.GameResult.KNOWN_LOSS){
+                    return Integer.MIN_VALUE +1;
+                }else{
+                    return 0;
                 }
-                return best_eval;
+            }else{
+                if(initial_depth >= final_depth || game_over(game_state)){
+                    return game_state.getStoreSouth() - game_state.getStoreNorth();
+                }
+            int best_move = Integer.MIN_VALUE;
+            int best_eval = -1000000;
+            for(int n : move_ordering(game_state)){
+                KalahState copier = new KalahState(game_state);
+                KalahState.Player player = copier.getSideToMove();
+                copier.doMove(n);
+                KalahState.Player after = copier.getSideToMove();
+                int eval = minmax_search(copier,initial_depth+1,final_depth,alpha,beta);
+                if(after == KalahState.Player.SOUTH){
+                    eval = -eval;
+                }
+                if(player == KalahState.Player.SOUTH){
+                    best_eval = Math.max(eval,best_eval);
+                    best_move = n;
+                }else{
+                    best_eval = Math.min(eval,best_eval);
+                    best_move = n;
+                }
+                if(player == KalahState.Player.SOUTH){
+                    alpha = Integer.max(alpha,best_eval);
+                }else{
+                    beta = Integer.min(beta,best_eval);
+                }
+
+                if(alpha >= beta){
+                    return best_eval;
+                }
+                if(initial_depth == 0){
+                    submitMove(best_move);
+                    String comment = "move : " + (best_move + 1) + "\n"+
+                            "eval : " + best_eval + "\n" +
+                            "depth : " + final_depth;
+                    sendComment(comment);
+                }
+
+
             }
+            return best_eval;
         }
 
 
