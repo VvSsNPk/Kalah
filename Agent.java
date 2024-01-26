@@ -12,11 +12,11 @@ class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") != null
+        super(System.getenv("USE_WEBSOCKET") == null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") != null
+              System.getenv("USE_WEBSOCKET") == null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
               "NoobMax Algorithm", // agent name
@@ -33,9 +33,8 @@ class Agent extends info.kwarc.kalah.Agent {
         int bestState = Integer.MIN_VALUE;
         int state;
         int depth = 1;
-
-        for(Integer a : ks.getMoves()){
-            while (!shouldStop()) {
+        while (!shouldStop()) {
+            for(Integer a : ks.getMoves()){
                 if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
@@ -47,18 +46,18 @@ class Agent extends info.kwarc.kalah.Agent {
                 }
             }
             depth++;
+            submitMove(bestMove);
         }
-        submitMove(bestMove);
+
     }
 
     private int minmax(KalahState a, int depth, int alpha, int beta, boolean maximizingPlayer) {
-        int bestState = 0;
-        int state;
         if(depth == 0 || game_over(a)) {
-            return a.getStoreSouth()- a.getStoreNorth();
+            return 9 * a.getStoreSouth() + a.getHouseSumSouth() - 9 * a.getStoreNorth() - a.getHouseSumNorth();
         }
+        int value;
         if(maximizingPlayer){
-            int value = Integer.MIN_VALUE;
+            value = Integer.MIN_VALUE;
             for(Integer n : a.getMoves()){
                 value = Math.max(value,minmax(a,depth,alpha,beta,false));
                 alpha = Math.max(alpha,value);
@@ -66,16 +65,15 @@ class Agent extends info.kwarc.kalah.Agent {
                     return value;
                 }
             }
-            return value;
         }else{
-            int value = Integer.MAX_VALUE;
+            value = Integer.MAX_VALUE;
             for(Integer n : a.getMoves()){
                 value = Math.min(value,minmax(a,depth-1,alpha,beta,true));
                 beta = Math.min(beta,value);
                 if( value <= alpha) return value;
             }
-            return value;
         }
+        return value;
 
     }
 
