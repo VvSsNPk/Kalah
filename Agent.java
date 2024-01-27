@@ -38,7 +38,7 @@ class Agent extends info.kwarc.kalah.Agent {
                 if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
-                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE,true);
+                    state = minmax(copy, depth, Integer.MIN_VALUE, Integer.MAX_VALUE,copy.getSideToMove() == KalahState.Player.SOUTH);
                     if (state > bestState) {
                         bestState = state;
                         bestMove = a;
@@ -59,7 +59,9 @@ class Agent extends info.kwarc.kalah.Agent {
         if(maximizingPlayer){
             value = Integer.MIN_VALUE;
             for(Integer n : a.getMoves()){
-                value = Math.max(value,minmax(a,depth,alpha,beta,false));
+                KalahState copy = new KalahState(a);
+                copy.doMove(n);
+                value = Math.max(value,minmax(copy,depth,alpha,beta,copy.getSideToMove() == KalahState.Player.SOUTH));
                 alpha = Math.max(alpha,value);
                 if(value >= beta){
                     return value;
@@ -68,7 +70,9 @@ class Agent extends info.kwarc.kalah.Agent {
         }else{
             value = Integer.MAX_VALUE;
             for(Integer n : a.getMoves()){
-                value = Math.min(value,minmax(a,depth-1,alpha,beta,true));
+                KalahState copy = new KalahState(a);
+                copy.doMove(n);
+                value = Math.min(value,minmax(copy,depth-1,alpha,beta,copy.getSideToMove() == KalahState.Player.SOUTH));
                 beta = Math.min(beta,value);
                 if( value <= alpha) return value;
             }
