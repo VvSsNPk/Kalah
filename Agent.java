@@ -12,14 +12,14 @@ class Agent extends info.kwarc.kalah.Agent {
     private final Random rng = new Random();
 
     public Agent() {
-        super(System.getenv("USE_WEBSOCKET") == null
+        super(System.getenv("USE_WEBSOCKET") != null
               ? "kalah.kwarc.info/socket" : "localhost",
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? null : 2671,
-              System.getenv("USE_WEBSOCKET") == null
+              System.getenv("USE_WEBSOCKET") != null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
-              "NoobMax Algorithm", // agent name
+              "NoobMax Algorithm 1", // agent name
               "Praveen Kumar, Sagar Sikdar", // author list
               "Minmax noob algorithm", // description
               "GODISALSOHUMAN", // agent token
@@ -53,7 +53,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
     private int minmax(KalahState a, int depth, int alpha, int beta, boolean maximizingPlayer) {
         if(depth == 0 || game_over(a)) {
-            return 9 * a.getStoreSouth() + a.getHouseSumSouth() - 9 * a.getStoreNorth() - a.getHouseSumNorth();
+            return a.getStoreSouth() -a.getStoreNorth();
         }
         int value;
         if(maximizingPlayer){
