@@ -82,11 +82,10 @@ class Agent extends info.kwarc.kalah.Agent {
                 }
                 if(player == KalahState.Player.SOUTH){
                     best_eval = Math.max(eval,best_eval);
-                    best_move = n;
                 }else{
                     best_eval = Math.min(eval,best_eval);
-                    best_move = n;
                 }
+                best_move = n;
                 if(player == KalahState.Player.SOUTH){
                     alpha = Integer.max(alpha,best_eval);
                 }else{
