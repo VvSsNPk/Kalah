@@ -33,8 +33,9 @@ class Agent extends info.kwarc.kalah.Agent {
         int bestState = Integer.MIN_VALUE;
         int state;
         int depth = 1;
+        while (!shouldStop()) {
         for(Integer a : ks.getMoves()){
-            while (!shouldStop()) {
+
                 if (ks.isLegalMove(a)) {
                     KalahState copy = new KalahState(ks);
                     copy.doMove(a);
@@ -45,13 +46,8 @@ class Agent extends info.kwarc.kalah.Agent {
                     }
                 }
             }
-            depth++;
-        }
-        if(ks.isLegalMove(bestMove)){
             submitMove(bestMove);
-        }
-        else{
-            submitMove(ks.randomLegalMove());
+            depth++;
         }
     }
 
