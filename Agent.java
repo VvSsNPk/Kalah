@@ -89,18 +89,7 @@ class Agent extends info.kwarc.kalah.Agent {
     }
 
     public int evaluation(KalahState a){
-        if(a.getSideToMove() == KalahState.Player.SOUTH){
-           /* if(a.getHouseSumSouth() > a.totalSeeds() / 2){
-                return Integer.MAX_VALUE;
-            }*/
-            return a.getHouseSumSouth() - a.getHouseSumNorth();
-        }
-        else{
-           /* if(a.getHouseSumNorth() > a.totalSeeds() / 2){
-                return  Integer.MAX_VALUE;
-            }*/
-            return a.getHouseSumNorth() - a.getHouseSumSouth();
-        }
+            return a.getStoreSouth() - a.getStoreNorth();
     }
 
 
