@@ -20,8 +20,8 @@ class Agent extends info.kwarc.kalah.Agent {
               System.getenv("USE_WEBSOCKET") != null
               ? ProtocolManager.ConnectionType.WebSocketSecure
               : ProtocolManager.ConnectionType.TCP,
-              "NoobMax Algorithm", // agent name
-              "Praveen Kumar, Sagar Sikdar", // author list
+              "Agent of Chaos", // agent name
+              "Praveen Kumar, Sagar Sikdar, Abhinav Singh", // author list
               "Minmax noob algorithm", // description
               "GODISALSOHUMAN", // agent token
               false  // suppress network
