@@ -41,7 +41,7 @@ class Agent extends info.kwarc.kalah.Agent {
                 KalahState.Player after = copy.getSideToMove();
                 int value;
                 if(before != after) {
-                    value = Integer.max(bestValue, -NegaMax(copy, depth - 1, Double.MIN_VALUE, Integer.MAX_VALUE));
+                    value = Integer.max(bestValue,  -NegaMax(copy, depth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE));
                 }else{
                     value = Integer.max(bestValue, NegaMax(copy,depth-1,Integer.MAX_VALUE,Integer.MIN_VALUE));
                 }
@@ -57,49 +57,41 @@ class Agent extends info.kwarc.kalah.Agent {
 
     }
 
-    private double NegaMax(KalahState state, int depth, double alpha, double beta){
+    private int NegaMax(KalahState state, int depth, double alpha, double beta){
         if(depth == 0 || game_over(state)){
             KalahState.GameResult result = state.result();
             if(result == KalahState.GameResult.UNDECIDED) {
-                LinkedList<Integer> a = new LinkedList<>(state.getMoves());
-                int seeds = state.getHouse(state.getSideToMove(),a.getLast());
-                int seeds2;
-                if(state.getSideToMove() == KalahState.Player.SOUTH){
-                    seeds2 = state.getHouseSumSouth();
-                }else{
-                    seeds2 = state.getHouseSumNorth();
-                }
-                return  0.199 * seeds2 + 0.190 * seeds2 + 0.371 * doubleMoves(state);
+                return state.getStoreLead();
             }else{
                 if(result == KalahState.GameResult.KNOWN_LOSS||result == KalahState.GameResult.LOSS){
-                    return  Double.MIN_VALUE + 1;
+                    return  Integer.MIN_VALUE + 1;
                 }else if(result == KalahState.GameResult.WIN || result == KalahState.GameResult.KNOWN_WIN) {
-                    return Double.MAX_VALUE;
+                    return Integer.MAX_VALUE;
                 }else{
                     return 0;
 
                 }
             }
         }else{
-            double bestValue = Double.MIN_VALUE;
+            int bestValue = Integer.MIN_VALUE;
             for(Integer n : move_ordering(state)){
                 KalahState copy = new KalahState(state);
                 KalahState.Player before = copy.getSideToMove();
                 copy.doMove(n);
                 KalahState.Player after = copy.getSideToMove();
                 if(before != after) {
-                    bestValue = Double.max(bestValue, -NegaMax(copy, depth - 1, -beta, -alpha));
+                    bestValue = Integer.max(bestValue, -NegaMax(copy, depth - 1, -beta, -alpha));
                 }else{
-                    bestValue = Double.max(bestValue, NegaMax(copy,depth-1,alpha,beta));
+                    bestValue = Integer.max(bestValue, NegaMax(copy,depth-1,alpha,beta));
                 }
                 alpha = Double.max(alpha,bestValue);
                 if(alpha >= beta){
                     break;
                 }
-                return bestValue;
+
             }
+            return bestValue;
         }
-        return 0;
     }
 
 
@@ -147,19 +139,7 @@ class Agent extends info.kwarc.kalah.Agent {
 
 
     public static void main(String[] args) throws IOException {
-        //new Agent().run();
-       KalahState ks = new KalahState(8,8);
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-       ks.doMove(ks.randomLegalMove());
-
-       System.out.println(ks.getHouse(ks.getSideToMove(),ks.lowestLegalMove()));
-       System.out.println(ks.getSideToMove() + " " + ks.lowestLegalMove());
-       ks.doMove(1);
+        new Agent().run();
     }
 
 }
